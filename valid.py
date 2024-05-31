@@ -89,15 +89,15 @@ if __name__ == "__main__":
         param.requires_grad = False
 
     model = Model(Ori_IFNet_loaded, args.local_rank)
+    pretrained_model_path = '/root/MyCode/Valid/dummy_ST_pyramid_GRU/intrain_log'
+    model.load_model(pretrained_model_path)
+    print("Loaded ConvLSTM model")
+    model.eval()
+    
     # Dummy parameters
     step = 5555
     dataset_val = VimeoDatasetSep('test')
     val_data = DataLoader(dataset_val, batch_size=4, pin_memory=True, num_workers=1)
     writer_val = SummaryWriter('validate')
-
-    pretrained_model_path = '/root/MyCode/Valid/dummy_ST_pyramid_GRU/intrain_log'
-    model.load_model(pretrained_model_path)
-    print("Loaded ConvLSTM model")
-    model.eval()
 
     evaluate(model, val_data, step, args.local_rank, writer_val)

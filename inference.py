@@ -2,7 +2,7 @@ import os
 import sys
 # import numpy as np
 sys.path.append('/root/SE/se/RIFE_LSTM_Context')
-root = '/root/SEatt_GRU-RIFE'
+root = '/root/MyCode/Valid/dummy_ST_pyramid_GRU'
 output_root = "/root/autodl-tmp"
 import torch
 import model.toloadRIFE as toload
@@ -85,19 +85,31 @@ def inference_video(model, frame_folder, output_folder, total_frames):
 
 from model.RIFE import Model
 
-# Load pretrained Optical Flow Model
-checkpoint =toload.convertload(torch.load(f'{pretrained_path}/flownet.pkl',map_location=device))
-Ori_IFNet_loaded = toload.IFNet_update()
-Ori_IFNet_loaded.load_state_dict(checkpoint)
-Ori_IFNet_loaded.eval()
-for param in Ori_IFNet_loaded.parameters():
-    param.requires_grad = False
-print("Loaded Pretrained RIFE")
 
-model = Model(Ori_IFNet_loaded, local_rank=0)
+if __name__ == "__main__":
+    torch.cuda.empty_cache()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--batch_size', default=7, type=int, help='minibatch size')
+    parser.add_argument('--local_rank', default=0, type=int, help='local rank')
+    parser.add_argument('--world_size', default=1, type=int, help='world size')
+    args = parser.parse_args()
 
-model.load_model(pretrained_model_path )
-print("Loaded ConvLSTM model")
-model.eval()
-model.to_device()
-inference_video(model.simple_inference, frame_path, output_path, 1200)
+    torch.distributed.init_process_group(backend="nccl", world_size=1, rank=0)
+    torch.cuda.set_device(args.local_rank)
+
+    torch.backends.cudnn.benchmark = True
+    pretrained_path = '/root/MyCode/Valid/dummy_ST_pyramid_GRU/RIFE_log'
+    checkpoint = convert_load(torch.load(f'{pretrained_path}/flownet.pkl', map_location=device))
+    Ori_IFNet_loaded = IFNet_update()
+    Ori_IFNet_loaded.load_state_dict(checkpoint)
+    for param in Ori_IFNet_loaded.parameters():
+        param.requires_grad = False
+
+    model = Model(Ori_IFNet_loaded, args.local_rank)
+    pretrained_model_path = '/root/MyCode/Valid/dummy_ST_pyramid_GRU/intrain_log'
+    model.load_model(pretrained_model_path)
+    print("Loaded ConvLSTM model")
+    model.eval()
+
+
+    inference_video(model.simple_inference, frame_path, output_path, 2000)
