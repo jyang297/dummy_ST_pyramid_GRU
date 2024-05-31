@@ -16,13 +16,8 @@ from model.VimeoSeptuplet import *
 
 device = torch.device("cuda")
 
-log_path = 'train_log'
-intrain_path = 'intrain_log'
-
 from model.pretrained_RIFE_loader import IFNet_update
 from model.pretrained_RIFE_loader import convert_load
-
-
 
 
 def evaluate(model, val_data, nr_eval, local_rank, writer_val):
@@ -90,7 +85,7 @@ if __name__ == "__main__":
     val_data = DataLoader(dataset_val, batch_size=4, pin_memory=True, num_workers=1)
     writer_val = SummaryWriter('validate')
 
-    pretrained_model_path = '/root/attention/CBAM/RIFE_LSTM_Context/intrain_log'
+    pretrained_model_path = '/intrain_log'
     model.load_model(pretrained_model_path)
     print("Loaded ConvLSTM model")
     model.eval()
