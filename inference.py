@@ -28,7 +28,7 @@ def load_frames(frame_folder, start_frame, num_frames=4):
     # Load a sequence of 'num_frames' starting from 'start_frame'
     frames = []
     for i in range(1,num_frames+1):
-        frame_path = os.path.join(frame_folder, f"frame_{start_frame + i:04d}.png")
+        frame_path = os.path.join(frame_folder, f"frame_{start_frame + i:04d}.jpg")
         frame = Image.open(frame_path).convert('RGB')
         frames.append(frame)
         if i != num_frames:
@@ -57,7 +57,7 @@ def preprocess_frames(frames):
 def save_frame(tensor, output_folder, frame_index):
     transform = transforms.ToPILImage()
     img = transform(tensor.cpu())
-    img.save(os.path.join(output_folder, f"frame_{frame_index:04d}.png"))
+    img.save(os.path.join(output_folder, f"frame_{frame_index:04d}.jpg"))
     ##print('save\n')
 
 def inference_video(model, frame_folder, output_folder, total_frames):
