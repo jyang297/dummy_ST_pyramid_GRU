@@ -78,7 +78,7 @@ class Model:
             if False:
                 _, _, output_allframes, _, _, _, _, _,_= self.flownet(imgs)
             if True:
-                _, _, output_allframes, _, _, _, _, _= self.flownet(imgs)
+                _, _, output_allframes, _, _, _, _, _, _= self.flownet(imgs)
 
             print('mergedout')
             # Assuming merged is the output tensor containing the interpolated frame
