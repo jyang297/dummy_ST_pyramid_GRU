@@ -1,23 +1,23 @@
 import os
 import sys
-# import numpy as np
-sys.path.append('/root/SE/se/RIFE_LSTM_Context')
-root = '/root/MyCode/Valid/dummy_ST_pyramid_GRU'
-output_root = "/root/autodl-tmp"
+import numpy as np
 import torch
-import model.toloadRIFE as toload
 import torchvision.transforms as transforms
 from PIL import Image
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+from model.RIFE import Model
+import argparse
+from model.pretrained_RIFE_loader import IFNet_update
+from model.pretrained_RIFE_loader import convert_load
 
 # Config
+root = '/root/MyCode/Valid/dummy_ST_pyramid_GRU'
+output_root = "/root/autodl-tmp"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# frame_path = output_root + "/outputs/dacing_slowmotion" # typo here I don't want to change it now
-frame_path = output_root + "/outputs/soccer_4x" 
+frame_path = "/root/autodl-fs/Origin/dancingGirls"
+# frame_path = output_root + "/outputs/soccer_4x" 
 # frame_path = "outputs/outputs_slowmotion"                
 
-output_path = output_root + "/outputs/soccer_8x"
+output_path = output_root + "/outputs/dancing/dancingGirls_2x"
 pretrained_model_path = root + '/intrain_log'
 pretrained_path = root + '/RIFE_log' # pretrained RIFE path
 shift = 0
@@ -83,7 +83,6 @@ def inference_video(model, frame_folder, output_folder, total_frames):
 
 
 
-from model.RIFE import Model
 
 
 if __name__ == "__main__":
@@ -94,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument('--world_size', default=1, type=int, help='world size')
     args = parser.parse_args()
 
-    torch.distributed.init_process_group(backend="nccl", world_size=1, rank=0)
+ 
     torch.cuda.set_device(args.local_rank)
 
     torch.backends.cudnn.benchmark = True
