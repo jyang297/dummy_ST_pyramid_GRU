@@ -57,7 +57,9 @@ class Model:
             }
             
         if rank <= 0:
-            self.flownet.load_state_dict(convert(torch.load('{}/flownet.pkl'.format(path))))
+            self.flownet.load_state_dict(torch.load('{}/flownet.pkl'.format(path)))
+            
+      
         
     def save_model(self, path, rank=0):
         if not os.path.exists(path):

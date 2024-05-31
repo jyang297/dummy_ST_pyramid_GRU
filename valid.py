@@ -36,17 +36,24 @@ def evaluate(model, val_data, nr_eval, local_rank, writer_val):
         # Changed for Septuplet 0 1 2 3 4 5 6
         b_data_gpu, _, h_data_gpu, w_data_gpu = data_gpu.shape
         display_all = data_gpu.view(b_data_gpu, 7, 3, h_data_gpu, w_data_gpu)
+        
         gt = []
         pred = []
         with torch.no_grad():
             pred_all, teapred, info = model.update(data_gpu, training=False)
             merged_img = info['merged_tea']
         for iframe in range(3):
-            gt.append(data_gpu[:, 6 * iframe + 3:6 * iframe + 6])
-            gt = torch.stack(gt, dim=1)  # B*N*C*H*W
-            pred.append(pred_all[:, 6 * iframe + 3:6 * iframe + 6])
-            pred = torch.stack(pred, dim=1)  # B*N*C*H*W
 
+            gt.append(data_gpu[:, 6 * iframe + 3:6 * iframe + 6])
+            pred.append(pred_all[:, 2*iframe+1])
+
+        # Stack the lists after the loop
+        print("gt shape", len(gt))
+        gt = torch.stack(gt, dim=1)  # B*N*C*H*W
+        pred = torch.stack(pred, dim=1) 
+        
+        PSNR_of_all_the_valid = 0
+        number_of_valid = 0
         for j in range(gt.shape[0]):
             sep_PSNR = torch.tensor(0.0)
             for k in range(3):
@@ -57,6 +64,9 @@ def evaluate(model, val_data, nr_eval, local_rank, writer_val):
             sep_PSNR = sep_PSNR / 3
             print("AVERAGE PSNR:", sep_PSNR, "currently at ", i)
             psnr_list.append(sep_PSNR)
+        PSNR_of_all_the_valid = np.mean(psnr_list)
+        print("PSNR of all the valid", PSNR_of_all_the_valid)
+        print("Estimated times", len(psnr_list))
 
 
 if __name__ == "__main__":
@@ -71,7 +81,7 @@ if __name__ == "__main__":
     torch.cuda.set_device(args.local_rank)
 
     torch.backends.cudnn.benchmark = True
-    pretrained_path = 'RIFE_log'
+    pretrained_path = '/root/MyCode/Valid/dummy_ST_pyramid_GRU/RIFE_log'
     checkpoint = convert_load(torch.load(f'{pretrained_path}/flownet.pkl', map_location=device))
     Ori_IFNet_loaded = IFNet_update()
     Ori_IFNet_loaded.load_state_dict(checkpoint)
@@ -85,7 +95,7 @@ if __name__ == "__main__":
     val_data = DataLoader(dataset_val, batch_size=4, pin_memory=True, num_workers=1)
     writer_val = SummaryWriter('validate')
 
-    pretrained_model_path = '/intrain_log'
+    pretrained_model_path = '/root/MyCode/Valid/dummy_ST_pyramid_GRU/intrain_log'
     model.load_model(pretrained_model_path)
     print("Loaded ConvLSTM model")
     model.eval()

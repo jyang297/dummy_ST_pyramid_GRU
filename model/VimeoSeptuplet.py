@@ -6,7 +6,7 @@ import numpy as np
 import random
 from torch.utils.data import DataLoader, Dataset
 
-data_root = "~/autodl-tmp/vimeo_septuplet"
+data_root = "/root/autodl-tmp/vimeo_septuplet"
 # data_root = '/home/jyzhao/Code/Datasets/vimeo_septuplet'
 # data_root = '/home/jyang297/scratch/vimeo_septuplet'
 
