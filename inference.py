@@ -13,12 +13,11 @@ from model.pretrained_RIFE_loader import convert_load
 root = '/root/MyCode/Valid/dummy_ST_pyramid_GRU'
 output_root = "/root/autodl-tmp"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# frame_path = output_root + "/outputs/dancing/dancingGirls_4x"
+# frame_path = "/root/autodl-fs/Origin/soccer"
+frame_path = output_root + "/outputs/soccer/soccer_4x"
 # frame_path = "outputs/outputs_slowmotion"                
-frame_path = "/root/autodl-fs/Origin/soccer"
 
-output_path = output_root + "/outputs/soccer/soccer_2x"
-
+output_path = output_root + "/outputs/soccer/soccer_8x"
 pretrained_model_path = root + '/intrain_log'
 pretrained_path = root + '/RIFE_log' # pretrained RIFE path
 shift = 0
@@ -28,20 +27,12 @@ shift = 0
 def load_frames(frame_folder, start_frame, num_frames=4):
     # Load a sequence of 'num_frames' starting from 'start_frame'
     frames = []
-    for i in range(1, num_frames + 1):
-        jpg_path = os.path.join(frame_folder, f"frame_{start_frame + i:04d}.jpg")
-        png_path = os.path.join(frame_folder, f"frame_{start_frame + i:04d}.png")
-        
-        if os.path.exists(jpg_path):
-            frame_path = jpg_path
-        elif os.path.exists(png_path):
-            frame_path = png_path
-        else:
-            raise FileNotFoundError(f"No image found for frame {start_frame + i:04d}")
-        
+    for i in range(1,num_frames+1):
+        frame_path = os.path.join(frame_folder, f"frame_{start_frame + i:04d}.jpg")
         frame = Image.open(frame_path).convert('RGB')
         frames.append(frame)
-    
+        if i != num_frames:
+            frames.append(frame)
         
     # print('load')
     return frames
@@ -120,4 +111,4 @@ if __name__ == "__main__":
     model.eval()
 
 
-    inference_video(model.simple_inference, frame_path, output_path, 2000)
+    inference_video(model.simple_inference, frame_path, output_path, 3000)
